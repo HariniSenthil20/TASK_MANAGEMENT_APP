@@ -21,7 +21,7 @@ const Task = sequelize.define('Task', {
   status: {
     type: DataTypes.ENUM('Todo', 'In Progress', 'Completed'),
     allowNull: false,
-    defaultValue: 'Open',
+    defaultValue: 'Todo',
   },
   userId: {
     type: DataTypes.INTEGER,

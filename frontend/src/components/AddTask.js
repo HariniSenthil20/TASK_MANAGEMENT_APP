@@ -156,12 +156,9 @@ const AddTask = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div className="form-group">
                   <label>Status</label>
-                  <select name="status" value={formData.status} onChange={handleChange}>
-                    <option value="Open">Open</option>
+                  <select name="status" value={formData.status} onChange={handleChange}>               
                     <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="On Hold">On Hold</option>
-                    <option value="Active">Active</option>
+                    <option value="Completed">Completed</option>                                      
                     <option value="Todo">Todo</option>
                   </select>
                 </div>

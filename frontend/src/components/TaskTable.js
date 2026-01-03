@@ -79,17 +79,38 @@ const TaskTable = ({ tasks, loading, onEdit, onDelete, onUpdate }) => {
     setPriorityMenu(null);
   };
 
-  const handleDelete = (taskId) => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
-      dispatch(deleteTask(taskId)).then(() => {
+  // const handleDelete = (taskId) => {
+  //   if (window.confirm('Are you sure you want to delete this task?')) {
+  //     dispatch(deleteTask(taskId)).then(() => {
+  //       dispatch(fetchTasks());
+  //       dispatch(fetchTaskStats());
+  //       if (onDelete) {
+  //         onDelete(taskId);
+  //       }
+  //     });
+  //   }
+  // };
+const handleDelete = (taskId) => {
+  // defer confirm to escape React StrictMode double-call
+  setTimeout(() => {
+    const confirmed = window.confirm('Are you sure you want to delete this task?');
+    if (!confirmed) return;
+
+    dispatch(deleteTask(taskId))
+      .unwrap()
+      .then(() => {
         dispatch(fetchTasks());
         dispatch(fetchTaskStats());
-        if (onDelete) {
-          onDelete(taskId);
-        }
+        onDelete?.(taskId);
       });
-    }
-  };
+  }, 0);
+};
+
+
+
+
+
+
 
   const handleEdit = (task) => {
     if (onEdit) {
@@ -104,11 +125,8 @@ const TaskTable = ({ tasks, loading, onEdit, onDelete, onUpdate }) => {
 
   const getStatusColor = (status) => {
     const colors = {
-      'Open': '#36a2eb',
       'In Progress': '#ffce56',
       'Completed': '#4bc0c0',
-      'On Hold': '#ff6384',
-      'Active': '#9966ff',
       'Todo': '#ff9f40',
     };
     return colors[status] || '#666';
