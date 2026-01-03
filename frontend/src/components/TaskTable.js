@@ -2,8 +2,9 @@ import { useState, useMemo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateTask, deleteTask, fetchTasks } from '../store/slices/taskSlice';
 import { fetchTaskStats } from '../store/slices/taskSlice';
+import { toast } from 'react-toastify';
 
-const TaskTable = ({ tasks, loading, onEdit, onDelete, onUpdate }) => {
+const TaskTable = ({ tasks, loading, onEdit, onUpdate }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const [selectedTasks, setSelectedTasks] = useState([]);
@@ -60,52 +61,36 @@ const TaskTable = ({ tasks, loading, onEdit, onDelete, onUpdate }) => {
 
   const handleStatusChange = (task, newStatus) => {
     dispatch(updateTask({ id: task.id, taskData: { status: newStatus } })).then(() => {
+      toast.success('Task status updated successfully.');
       dispatch(fetchTasks());
       dispatch(fetchTaskStats());
-      if (onUpdate) {
-        onUpdate(task.id, { status: newStatus });
-      }
+    }).catch(() => {
+      toast.error('Failed to update task status.');
     });
   };
 
   const handlePriorityChange = (task, newPriority) => {
     dispatch(updateTask({ id: task.id, taskData: { priority: newPriority } })).then(() => {
+      toast.success('Task priority updated successfully.');
       dispatch(fetchTasks());
       dispatch(fetchTaskStats());
-      if (onUpdate) {
-        onUpdate(task.id, { priority: newPriority });
-      }
-    });
+    }).catch(() => {
+      toast.error('Failed to update task priority.');
+    })
     setPriorityMenu(null);
   };
 
-  // const handleDelete = (taskId) => {
-  //   if (window.confirm('Are you sure you want to delete this task?')) {
-  //     dispatch(deleteTask(taskId)).then(() => {
-  //       dispatch(fetchTasks());
-  //       dispatch(fetchTaskStats());
-  //       if (onDelete) {
-  //         onDelete(taskId);
-  //       }
-  //     });
-  //   }
-  // };
-const handleDelete = (taskId) => {
-  // defer confirm to escape React StrictMode double-call
-  setTimeout(() => {
-    const confirmed = window.confirm('Are you sure you want to delete this task?');
-    if (!confirmed) return;
-
-    dispatch(deleteTask(taskId))
-      .unwrap()
-      .then(() => {
+  const handleDelete = (taskId) => {
+    if (window.confirm('Are you sure you want to delete this task?')) {
+      dispatch(deleteTask(taskId)).then(() => {
+        toast.success('Task deleted successfully.');
         dispatch(fetchTasks());
         dispatch(fetchTaskStats());
-        onDelete?.(taskId);
+      }).catch(() => {
+        toast.error('Failed to delete task.');
       });
-  }, 0);
-};
-
+    }
+  };
 
 
 
@@ -315,12 +300,10 @@ const handleDelete = (taskId) => {
                     onChange={(e) => handleStatusChange(task, e.target.value)}
                     className="status-select"
                     style={{ borderColor: getStatusColor(task.status) }}
-                  >
-                    
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                   
+                  >                    
                     <option value="Todo">Todo</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>                  
                   </select>
                 </td>
                 <td>{formatDate(task.startDate || task.createdAt)}</td>
@@ -349,14 +332,17 @@ const handleDelete = (taskId) => {
                   <div className="task-actions">
                     <button
                       className="btn-action edit"
-                      onClick={() => handleEdit(task)}
+                      onClick={(e) => { e.preventDefault(); handleEdit(task)}}
                       title="Edit Task"
                     >
                       ✏️
                     </button>
                     <button
                       className="btn-action delete"
-                      onClick={() => handleDelete(task.id)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleDelete(task.id)
+                      }}
                       title="Delete Task"
                     >
                       🗑️

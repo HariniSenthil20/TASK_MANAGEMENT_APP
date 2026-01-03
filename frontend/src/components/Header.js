@@ -59,17 +59,6 @@ const Header = ({ activeTab, onTabChange }) => {
                     <div className="user-dropdown-email">{user?.email}</div>
                   </div>
                 </div>
-                <div className="user-dropdown-divider"></div>
-                <div className="user-dropdown-item" onClick={() => { setShowUserMenu(false); }}>
-                  Profile Settings
-                </div>
-                <div className="user-dropdown-item" onClick={() => { setShowUserMenu(false); }}>
-                  Preferences
-                </div>
-                <div className="user-dropdown-item" onClick={() => { setShowUserMenu(false); }}>
-                  Help & Support
-                </div>
-                <div className="user-dropdown-divider"></div>
                 <div className="user-dropdown-item logout" onClick={handleLogout}>
                   Logout
                 </div>

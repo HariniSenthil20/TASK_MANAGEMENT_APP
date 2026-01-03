@@ -1,5 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { 
+  GET_TASKS_URL, 
+  GET_TASK_URL, 
+  POST_TASK_URL,
+  PUT_TASK_URL,
+  DELETE_TASK_URL,
+  GET_TASK_STATS_URL
+ } from '../../helpers/url_helper';
 
 const API_URL = 'http://localhost:5001/api';
 
@@ -12,7 +20,7 @@ export const fetchTasks = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
-      const response = await axios.get(`${API_URL}/tasks`, {
+      const response = await axios.get(`${GET_TASKS_URL}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -32,7 +40,7 @@ export const fetchTaskStats = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
-      const response = await axios.get(`${API_URL}/tasks/stats`, {
+      const response = await axios.get(`${GET_TASK_STATS_URL}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -52,7 +60,7 @@ export const createTask = createAsyncThunk(
   async (taskData, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
-      const response = await axios.post(`${API_URL}/tasks`, taskData, {
+      const response = await axios.post(`${POST_TASK_URL}`, taskData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -72,7 +80,7 @@ export const updateTask = createAsyncThunk(
   async ({ id, taskData }, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
-      const response = await axios.put(`${API_URL}/tasks/${id}`, taskData, {
+      const response = await axios.put(`${PUT_TASK_URL}${id}`, taskData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -92,12 +100,12 @@ export const deleteTask = createAsyncThunk(
   async (id,  { rejectWithValue }) => {
     try {
       const token = getAuthToken();
-      await axios.put(`${API_URL}/tasks/deleteTask/${id}`, {}, {
+      const response = await axios.put(`${DELETE_TASK_URL}${id}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      return id;
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || 'Failed to delete task'

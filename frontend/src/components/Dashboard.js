@@ -11,6 +11,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import TaskTable from './TaskTable';
 import TaskStats from './TaskStats';
+import { toast } from 'react-toastify';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -23,20 +24,9 @@ const Dashboard = () => {
     setActiveTab(tabId);
   };
 
-  useEffect(() => {
-    dispatch(fetchTasks());
-    dispatch(fetchTaskStats());
-  }, [dispatch]);
 
-  // Refresh tasks when returning from edit page
-  useEffect(() => {
-    const handleFocus = () => {
-      dispatch(fetchTasks());
-      dispatch(fetchTaskStats());
-    };
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
-  }, [dispatch]);
+
+
 
   const handleEditTask = (task) => {
     navigate(`/tasks/edit/${task.id}`);
@@ -44,19 +34,17 @@ const Dashboard = () => {
 
   const handleUpdateTask = (id, taskData) => {
     dispatch(updateTask({ id, taskData })).then(() => {
-      dispatch(fetchTasks());
-      dispatch(fetchTaskStats());
-    });
+      toast.success('Task updated successfully.');
+    }).catch(() => {
+      toast.error('Failed to update task.');
+    })
   };
 
-  const handleDeleteTask = (id) => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
-      dispatch(deleteTask(id)).then(() => {
-        dispatch(fetchTasks());
-        dispatch(fetchTaskStats());
-      });
-    }
-  };
+    useEffect(() => {
+    dispatch(fetchTasks());
+    dispatch(fetchTaskStats());
+  }, []);
+
 
   return (
     <div className="app-layout">
@@ -89,7 +77,6 @@ const Dashboard = () => {
                 loading={loading}
                 onEdit={handleEditTask}
                 onUpdate={handleUpdateTask}
-                onDelete={handleDeleteTask}
               />
             </div>
           )}

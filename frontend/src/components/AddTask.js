@@ -14,9 +14,7 @@ const AddTask = () => {
   const { tasks } = useSelector((state) => state.tasks);
   const [activeTab, setActiveTab] = useState('tasks');
 
-  useEffect(() => {
-    dispatch(fetchTasks());
-  }, [dispatch]);
+
 
   const handleNavClick = (tabId) => {
     setActiveTab(tabId);
@@ -30,8 +28,8 @@ const AddTask = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    status: 'Open',
-    priority: 'None',
+    status: '',
+    priority: '',
     startDate: new Date().toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],   
     ownerId: user?.id,
@@ -80,9 +78,13 @@ const AddTask = () => {
     } else if (formData.title.trim().length < 3) {
       newErrors.title = 'Title must be at least 3 characters';
     }
+    if (!formData.status) {
+      newErrors.status = 'Status is required';
+    }
 
-    
-
+    if (!formData.priority) {
+      newErrors.priority = 'Priority is required';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -100,8 +102,6 @@ const AddTask = () => {
       } else {
         await dispatch(createTask(formData)).unwrap();
       }
-      dispatch(fetchTasks());
-      dispatch(fetchTaskStats());
       navigate('/dashboard');
     } catch (error) {
       setErrors({ submit: error || 'Failed to save task' });
@@ -117,7 +117,7 @@ const AddTask = () => {
           <div className="page-header">
             <h2>{editingTask ? 'Edit Task' : 'Add New Task'}</h2>
             <button className="btn btn-secondary" onClick={() => navigate('/dashboard')}>
-              Cancel
+              Go Back
             </button>
           </div>
 
@@ -155,22 +155,30 @@ const AddTask = () => {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div className="form-group">
-                  <label>Status</label>
-                  <select name="status" value={formData.status} onChange={handleChange}>               
+                  <label>Status *</label>
+                  <select name="status" value={formData.status} onChange={handleChange}>
+                    <option value="" disabled>
+                    Select Status
+                    </option>               
+                    <option value="Todo">Todo</option>
                     <option value="In Progress">In Progress</option>
                     <option value="Completed">Completed</option>                                      
-                    <option value="Todo">Todo</option>
                   </select>
+                  {errors?.status && <div className="error-message">{errors?.status}</div>}
                 </div>
 
                 <div className="form-group">
-                  <label>Priority</label>
+                  <label>Priority *</label>
                   <select name="priority" value={formData.priority} onChange={handleChange}>
+                    <option value="" disabled>
+                    Select priority
+                    </option>
                     <option value="None">None</option>
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
                     <option value="High">High</option>
                   </select>
+                  {errors?.priority && <div className="error-message">{errors?.priority}</div>}
                 </div>
               </div>
 

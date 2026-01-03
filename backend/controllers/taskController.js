@@ -236,7 +236,7 @@ const deleteTask = async (req, res) => {
 const getTaskStats = async (req, res) => {
   try {
     const tasks = await Task.findAll({
-      where: { userId: req.user.id  },
+      where: { userId: req.user.id, isDeleted: false  },
     });
 
     const stats = {
